@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf7f1">
+<title>Мой помощник</title>
+<style>
+  :root{
+    --bg:#fbf7f1; --card:#ffffff; --ink:#26211d; --muted:#6b625b; --line:#e4dbd0;
+    --accent:#2f6f5e; --accent-soft:#e3f0ec; --warm:#fff1d6; --sos:#b3261e; --scale:1;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{font-size:calc(18px * var(--scale))}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+    font-family:Georgia,"Times New Roman",serif;line-height:1.35}
+  #app{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:640px;margin:0 auto;
+    padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+  header{display:flex;align-items:center;gap:.5rem;padding:.6rem .8rem;border-bottom:2px solid var(--line);min-height:3.6rem}
+  header h1{flex:1;font-size:1.3rem;margin:0;text-align:center}
+  .hbtn{font:inherit;font-size:1rem;font-weight:700;min-width:3.4rem;min-height:2.8rem;border-radius:.9rem;
+    border:2px solid var(--accent);background:#fff;color:var(--accent);padding:0 .7rem;cursor:pointer}
+  .hbtn[hidden]{display:none}
+  main{flex:1;overflow-y:auto;padding:1rem .9rem 1.2rem;-webkit-overflow-scrolling:touch}
+  .sos{flex:0 0 auto;margin:.5rem .8rem .7rem;font:inherit;font-size:1.25rem;font-weight:700;color:#fff;
+    background:var(--sos);border:none;border-radius:1.1rem;min-height:3.8rem;cursor:pointer}
+  .sos[hidden]{display:none}
+  .btn{display:block;width:100%;font:inherit;font-size:1.2rem;font-weight:700;min-height:3.6rem;padding:.6rem 1rem;
+    border-radius:1.1rem;border:2px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;margin:0 0 .7rem;text-align:center}
+  .btn.sec{background:#fff;color:var(--accent)}
+  .btn.red{background:var(--sos);border-color:var(--sos)}
+  .btn.small{min-height:2.8rem;font-size:1rem;width:auto;display:inline-block;margin:0 .4rem .4rem 0}
+  .btn:disabled{opacity:.4}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+  .tile{font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;
+    min-height:6.3rem;border-radius:1.2rem;border:2px solid var(--line);background:var(--card);color:var(--ink);
+    font-size:1.1rem;font-weight:700;padding:.6rem .4rem;cursor:pointer;text-align:center}
+  .tile .ic{font-size:2.3rem;line-height:1}
+  .tile:active,.btn:active,.card:active,.hbtn:active{transform:scale(.97)}
+  .clock{text-align:center;margin:0 0 .6rem}
+  .clock .hi{font-size:1.05rem;color:var(--muted)}
+  .clock .time{font-size:2.8rem;font-weight:700;line-height:1.1}
+  .clock .date{font-size:1.1rem;color:var(--muted)}
+  .clock .date::first-letter{text-transform:uppercase}
+  .today{background:var(--warm);border-radius:1.1rem;padding:.6rem .9rem;margin-bottom:.7rem;font-size:1rem}
+  .today b{display:block;margin-bottom:.2rem}
+  .fam{display:block;text-align:center;margin:1rem auto 0;color:var(--muted);font-size:.9rem;text-decoration:underline;
+    background:none;border:none;font-family:inherit;cursor:pointer;padding:.6rem}
+  h2{font-size:1.2rem;margin:1rem 0 .5rem}
+  p{margin:.2rem 0 .8rem}
+  .muted{color:var(--muted)}
+  .item{display:flex;align-items:center;gap:.8rem;background:var(--card);border:2px solid var(--line);border-radius:1.1rem;
+    padding:.7rem .9rem;margin-bottom:.6rem;font-size:1.1rem;width:100%;font-family:inherit;color:var(--ink);text-align:left}
+  .item .ic{font-size:1.9rem}
+  .item .tx{flex:1;min-width:0}
+  .item .tx small{display:block;color:var(--muted);font-size:.85rem}
+  .item img.av{width:3.6rem;height:3.6rem;border-radius:50%;object-fit:cover}
+  .item .av.ph{width:3.6rem;height:3.6rem;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:1.8rem}
+  button.item{cursor:pointer}
+  .del{font:inherit;font-size:1.4rem;background:none;border:none;cursor:pointer;padding:.3rem .5rem}
+  label.f{display:block;font-weight:700;margin:.9rem 0 .3rem}
+  input[type=text],input[type=tel],input[type=time],input[type=date],select{width:100%;font:inherit;font-size:1.15rem;padding:.7rem .8rem;
+    border-radius:.9rem;border:2px solid var(--line);background:#fff;color:var(--ink)}
+  .chips{display:flex;flex-wrap:wrap;gap:.5rem}
+  .chip{font:inherit;font-size:1rem;padding:.6rem .9rem;border-radius:2rem;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+  .chip.on{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+  .center{text-align:center}
+  .big{font-size:1.5rem;font-weight:700}
+  .bigav{width:9rem;height:9rem;border-radius:50%;object-fit:cover;display:block;margin:0 auto .8rem}
+  .bigav.ph{background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:4rem}
+  /* games */
+  .info{text-align:center;font-size:1.15rem;margin-bottom:.7rem}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
+  .card{font:inherit;aspect-ratio:1/1;border-radius:1rem;border:2px solid var(--accent);background:var(--accent-soft);
+    font-size:2.6rem;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink)}
+  .card.open{background:#fff}
+  .card.done{background:#d7ecd0;border-color:#8bc27a}
+  .win{background:#d7ecd0;border-radius:1.1rem;padding:1rem;text-align:center;font-size:1.3rem;font-weight:700;margin:.8rem 0}
+  .slots,.tiles{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin:.7rem 0}
+  .slots{flex-wrap:nowrap;gap:.3rem}
+  .slot,.ltr{font:inherit;width:3.1rem;height:3.5rem;border-radius:.8rem;font-size:1.6rem;font-weight:700;display:flex;
+    align-items:center;justify-content:center;cursor:pointer}
+  .slot{flex:1 1 0;min-width:0;max-width:3.1rem;width:auto;padding:0;border:2px dashed var(--muted);background:#fff;color:var(--ink)}
+  .slot.ok{background:#d7ecd0;border:2px solid #8bc27a}
+  .ltr{border:2px solid var(--accent);background:var(--accent-soft);color:var(--ink)}
+  .ltr.used{opacity:.25}
+  .emo{font-size:5rem;text-align:center;line-height:1.1;margin:.4rem 0}
+  .shake{animation:shake .4s}
+  @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+  .pz{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:min(90vw,52vh,420px);aspect-ratio:1/1;margin:0 auto .8rem}
+  .pz .pc{border:3px solid transparent;border-radius:6px;cursor:pointer;background-repeat:no-repeat}
+  .pz .pc.sel{border-color:var(--sos)}
+  .pick{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
+  .pick .card.sel{border-color:var(--sos);background:#ffe3df}
+  .show{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;font-size:3.4rem;margin:1rem 0}
+  /* calc */
+  .disp{background:#fff;border:2px solid var(--line);border-radius:1rem;font-size:2.4rem;font-weight:700;text-align:right;padding:.6rem .9rem;
+    min-height:4.2rem;overflow:hidden;white-space:nowrap;margin-bottom:.6rem}
+  .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem}
+  .key{font:inherit;font-size:1.7rem;font-weight:700;min-height:3.9rem;border-radius:1rem;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+  .key.op{background:var(--accent-soft);border-color:var(--accent)}
+  .key.eq{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .key.cl{background:#ffe3df;border-color:var(--sos)}
+  /* photos */
+  .photos{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+  .photos button{padding:0;border:none;background:none;cursor:pointer}
+  .photos img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:.7rem;display:block}
+  .viewer img{width:100%;max-height:58vh;object-fit:contain;border-radius:.8rem;background:#000;display:block;margin-bottom:.7rem}
+  .row{display:flex;gap:.6rem}
+  .row .btn{margin-bottom:.6rem}
+  .tabs{display:flex;gap:.5rem;margin-bottom:.8rem}
+  .tabs .chip{flex:1;text-align:center;font-weight:700}
+  .now{background:var(--accent-soft);border-radius:1.1rem;padding:.8rem;margin-bottom:.8rem;text-align:center}
+  .now .nm{font-weight:700;font-size:1.1rem;margin-bottom:.4rem}
+  #modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:1.2rem;z-index:20}
+  #modal[hidden]{display:none}
+  #modal .box{background:#fff;border-radius:1.3rem;padding:1.2rem;width:100%;max-width:420px;font-size:1.2rem;text-align:center}
+  #toast{position:fixed;left:50%;bottom:6.5rem;transform:translateX(-50%);background:#26211d;color:#fff;padding:.8rem 1.1rem;border-radius:1rem;
+    font-size:1rem;z-index:30;max-width:90vw;text-align:center}
+  #toast[hidden]{display:none}
+  button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #e0a040;outline-offset:2px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <button class="hbtn" id="backBtn" data-act="back" hidden>← Назад</button>
+    <h1 id="title">Мой помощник</h1>
+    <button class="hbtn" id="speakBtn" data-act="speak" aria-label="Прочитать вслух">🔊</button>
+  </header>
+  <main id="main"></main>
+  <button class="sos" id="sosBar" data-act="sos">🆘 Позвать на помощь</button>
+</div>
+<div id="modal" hidden></div>
+<div id="toast" hidden></div>
+
+<script>
+"use strict";
+/* ---------- утилиты ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pad = n => String(n).padStart(2, "0");
+const ymd = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------- хранилище ---------- */
+const KEY = "babushka-v1";
+const defaults = () => ({ contacts: [], sos: null, reminders: [], scale: 1, seq: 1 });
+let D = (() => { try { const d = JSON.parse(localStorage.getItem(KEY)); if (d) return Object.assign(defaults(), d); } catch (e) {} return defaults(); })();
+function save() { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { toast("Не получилось сохранить"); } }
+function applyScale() { document.documentElement.style.setProperty("--scale", D.scale); }
+
+/* IndexedDB для фото и аудио */
+const idb = {
+  db: null,
+  open() {
+    return new Promise((res, rej) => {
+      if (this.db) return res(this.db);
+      const r = indexedDB.open("babushka", 1);
+      r.onupgradeneeded = () => {
+        r.result.createObjectStore("photos", { keyPath: "id", autoIncrement: true });
+        r.result.createObjectStore("audio", { keyPath: "id", autoIncrement: true });
+      };
+      r.onsuccess = () => { this.db = r.result; res(this.db); };
+      r.onerror = () => rej(r.error);
+    });
+  },
+  async tx(store, mode, fn) {
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const t = db.transaction(store, mode); const s = t.objectStore(store);
+      const rq = fn(s);
+      t.oncomplete = () => res(rq && rq.result);
+      t.onerror = () => rej(t.error);
+    });
+  },
+  all(store) { return this.tx(store, "readonly", s => s.getAll()).then(x => x || []); },
+  add(store, v) { return this.tx(store, "readwrite", s => s.add(v)); },
+  del(store, id) { return this.tx(store, "readwrite", s => s.delete(id)); }
+};
+
+/* ---------- связь с Android ---------- */
+const CAP = window.Capacitor;
+const isNative = !!(CAP && CAP.isNativePlatform && CAP.isNativePlatform());
+function plug(n) {
+  if (!isNative) return null;
+  try { return (CAP.Plugins && CAP.Plugins[n]) || CAP.registerPlugin(n); } catch (e) { return null; }
+}
+async function openUrl(url) {
+  const L = plug("AppLauncher");
+  if (L) { try { await L.openUrl({ url }); return; } catch (e) {} }
+  try { window.location.href = url; } catch (e) {}
+  if (!isNative) toast("В телефоне здесь откроется набор номера");
+}
+const cleanNum = p => String(p).replace(/[^\d+]/g, "");
+const callPhone = p => openUrl("tel:" + cleanNum(p));
+async function speak(text) {
+  const T = plug("TextToSpeech");
+  if (T) { try { await T.stop(); await T.speak({ text, lang: "ru-RU", rate: 0.9, pitch: 1, volume: 1 }); return; } catch (e) {} }
+  if ("speechSynthesis" in window) {
+    try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = "ru-RU"; u.rate = 0.9; speechSynthesis.speak(u); return; } catch (e) {}
+  }
+  toast("Чтение вслух здесь недоступно");
+}
+
+/* ---------- окошки ---------- */
+let toastT;
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2800); }
+function ask(msg, yes = "Да", no = "Нет") {
+  return new Promise(res => {
+    const m = $("#modal");
+    m.innerHTML = `<div class="box"><p>${esc(msg)}</p><button class="btn" data-v="1">${esc(yes)}</button><button class="btn sec" data-v="0">${esc(no)}</button></div>`;
+    m.hidden = false;
+    m.onclick = e => { const b = e.target.closest("[data-v]"); if (!b) return; m.hidden = true; m.innerHTML = ""; res(b.dataset.v === "1"); };
+  });
+}
+
+/* ---------- напоминания ---------- */
+const KINDS = { med: ["💊", "Лекарство"], doctor: ["🩺", "Врач"], bill: ["💡", "Оплатить счёт"], bday: ["🎂", "День рождения"], other: ["📌", "Другое"], alarm: ["⏰", "Будильник"] };
+const REPEATS = { daily: "Каждый день", yearly: "Каждый год", once: "Один раз" };
+const remTitle = r => (KINDS[r.kind] || KINDS.other)[0] + " " + (r.title || (KINDS[r.kind] || KINDS.other)[1]);
+function occursOn(r, d) {
+  if (r.repeat === "daily") return true;
+  if (!r.date) return false;
+  if (r.repeat === "yearly") return r.date.slice(5) === ymd(d).slice(5);
+  return r.date === ymd(d);
+}
+async function scheduleRem(r) {
+  const N = plug("LocalNotifications");
+  if (!N) return false;
+  try {
+    let p = await N.checkPermissions();
+    if (p.display !== "granted") { p = await N.requestPermissions(); }
+    if (p.display !== "granted") { toast("Разрешите уведомления в настройках телефона"); return false; }
+    const [hh, mm] = r.time.split(":").map(Number);
+    let sch;
+    if (r.repeat === "daily") sch = { on: { hour: hh, minute: mm }, allowWhileIdle: true };
+    else if (r.repeat === "yearly") { const d = new Date(r.date + "T00:00"); sch = { on: { month: d.getMonth() + 1, day: d.getDate(), hour: hh, minute: mm }, allowWhileIdle: true }; }
+    else { const at = new Date(r.date + "T" + r.time); if (at <= new Date()) return true; sch = { at, allowWhileIdle: true }; }
+    await N.schedule({ notifications: [{ id: r.nid, title: remTitle(r), body: r.kind === "alarm" ? "Пора!" : "Напоминание", schedule: sch }] });
+    return true;
+  } catch (e) { console.error(e); return false; }
+}
+async function cancelRem(r) { const N = plug("LocalNotifications"); if (N) { try { await N.cancel({ notifications: [{ id: r.nid }] }); } catch (e) {} } }
+async function addReminder(r) {
+  r.id = D.seq++; r.nid = r.id;
+  D.reminders.push(r); save();
+  const ok = await scheduleRem(r);
+  if (!ok && isNative) toast("Сохранено, но сигнал не поставлен");
+  return r;
+}
+async function removeReminder(id) {
+  const r = D.reminders.find(x => x.id === id);
+  if (r) await cancelRem(r);
+  D.reminders = D.reminders.filter(x => x.id !== id); save();
+}
+function todayList() {
+  const now = new Date();
+  return D.reminders.filter(r => r.kind !== "alarm" && occursOn(r, now)).sort((a, b) => a.time.localeCompare(b.time));
+}
+
+/* ---------- экраны ---------- */
+const S = {};
+let stack = [{ name: "home" }];
+let leave = null;
+const cur = () => stack[stack.length - 1];
+function go(name, params) { stack.push({ name, params: params || {} }); render(); }
+function back() { if (stack.length > 1) { stack.pop(); render(); return true; } return false; }
+function toHome() { stack = [{ name: "home" }]; render(); }
+
+let speakText = () => "";
+function render() {
+  if (leave) { try { leave(); } catch (e) {} leave = null; }
+  if (window.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) {}
+  const c = cur();
+  const s = S[c.name](c.params || {});
+  $("#title").textContent = s.title;
+  $("#main").innerHTML = s.html;
+  $("#main").scrollTop = 0;
+  $("#backBtn").hidden = stack.length < 2;
+  $("#sosBar").hidden = !!s.noSos;
+  speakText = s.speak || (() => s.title);
+  leave = s.leave || null;
+  if (s.after) s.after($("#main"));
+}
+
+/* главный экран */
+S.home = () => {
+  const h = new Date().getHours();
+  const hi = h < 5 ? "Доброй ночи!" : h < 12 ? "Доброе утро!" : h < 18 ? "Добрый день!" : "Добрый вечер!";
+  const html = `
+    <div class="clock"><div class="hi">${hi}</div><div class="time" id="clk"></div><div class="date" id="dt"></div></div>
+    <div class="today" id="todayBox"></div>
+    <div class="grid">
+      <button class="tile" data-act="go" data-to="call"><span class="ic">📞</span>Позвонить</button>
+      <button class="tile" data-act="go" data-to="remind"><span class="ic">🔔</span>Напоминания</button>
+      <button class="tile" data-act="go" data-to="games"><span class="ic">🧩</span>Игры и память</button>
+      <button class="tile" data-act="go" data-to="photos"><span class="ic">🖼️</span>Фото семьи</button>
+      <button class="tile" data-act="go" data-to="listen"><span class="ic">🎧</span>Слушать</button>
+      <button class="tile" data-act="go" data-to="tools"><span class="ic">🧰</span>Полезное</button>
+    </div>
+    <button class="fam" data-act="go" data-to="family">Для семьи</button>`;
+  const todayTxt = () => {
+    const list = todayList(); const now = new Date(); const hm = pad(now.getHours()) + ":" + pad(now.getMinutes());
+    if (!list.length) return "На сегодня дел нет. Отдыхайте.";
+    const next = list.filter(r => r.time >= hm);
+    return "Сегодня: " + (next.length ? next : list).map(r => r.time + ", " + remTitle(r).replace(/^\S+\s/, "")).join("; ") + ".";
+  };
+  return {
+    title: "Мой помощник", html, noSos: false,
+    speak: () => hi + " " + todayTxt(),
+    after() {
+      const tick = () => {
+        const n = new Date();
+        const clk = $("#clk"); if (!clk) return;
+        clk.textContent = pad(n.getHours()) + ":" + pad(n.getMinutes());
+        $("#dt").textContent = n.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
+        const list = todayList(); const hm = pad(n.getHours()) + ":" + pad(n.getMinutes());
+        const rest = list.filter(r => r.time >= hm);
+        $("#todayBox").innerHTML = !list.length ? "На сегодня дел нет. Отдыхайте. 🌿"
+          : "<b>Сегодня:</b>" + (rest.length ? rest : list).map(r => `${esc(r.time)} — ${esc(remTitle(r))}`).join("<br>");
+      };
+      tick(); const iv = setInterval(tick, 20000);
+      leave = () => clearInterval(iv);
+    }
+  };
+};
+
+/* звонки */
+S.call = () => {
+  const c = D.contacts;
+  const html = c.length
+    ? "<p class='muted'>Нажмите на того, кому хотите позвонить.</p>" + c.map(x => `
+        <button class="item" data-act="callAsk" data-id="${x.id}">
+          ${x.photo ? `<img class="av" src="${x.photo}" alt="">` : `<span class="av ph">👤</span>`}
+          <span class="tx"><span class="big">${esc(x.name)}</span></span><span class="ic">📞</span></button>`).join("")
+    : `<p>Здесь пока никого нет. Попросите родных добавить номера: на главном экране внизу есть кнопка «Для семьи».</p>
+       <button class="btn sec" data-act="go" data-to="contactEdit">Добавить человека</button>`;
+  return { title: "Позвонить", html, speak: () => c.length ? "Кому позвонить? " + c.map(x => x.name).join(", ") : "Здесь пока никого нет." };
+};
+S.callConfirm = ({ id }) => {
+  const x = D.contacts.find(c => c.id == id);
+  if (!x) return { title: "Позвонить", html: "<p>Не нашёл этого человека.</p>" };
+  return {
+    title: "Позвонить", noSos: false,
+    html: `<div class="center">${x.photo ? `<img class="bigav" src="${x.photo}" alt="">` : `<div class="bigav ph">👤</div>`}
+      <p class="big">Позвонить: ${esc(x.name)}?</p></div>
+      <button class="btn" data-act="doCall" data-phone="${esc(x.phone)}">📞 Позвонить</button>
+      <button class="btn sec" data-act="back">Нет, назад</button>`,
+    speak: () => "Позвонить: " + x.name + "?"
+  };
+};
+S.sos = () => {
+  const x = D.contacts.find(c => c.id == D.sos) || D.contacts[0];
+  if (!x) return { title: "Помощь", noSos: true, html: `<p class="big center">Семья ещё не выбрала, кому звонить.</p><p class="center">Попросите родных открыть «Для семьи» и добавить номер.</p><button class="btn sec" data-act="back">Назад</button>` };
+  return {
+    title: "Помощь", noSos: true,
+    html: `<p class="big center">Позвать на помощь?</p>
+      <p class="center">Мы позвоним: <b>${esc(x.name)}</b></p>
+      <button class="btn red" data-act="doCall" data-phone="${esc(x.phone)}">🆘 Да, позвонить</button>
+      <button class="btn sec" data-act="doSms" data-phone="${esc(x.phone)}">✉️ Отправить сообщение «Мне нужна помощь»</button>
+      <button class="btn sec" data-act="back">Нет, вернуться</button>`,
+    speak: () => "Позвать на помощь? Мы позвоним: " + x.name
+  };
+};
+
+/* напоминания */
+function remCard(r, withDel) {
+  const when = r.repeat === "daily" ? "каждый день в " + r.time
+    : r.repeat === "yearly" ? "каждый год, " + new Date(r.date + "T00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "long" }) + ", " + r.time
+    : new Date(r.date + "T00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "long" }) + ", " + r.time;
+  return `<div class="item"><span class="tx"><span class="big">${esc(remTitle(r))}</span><small>${esc(when)}</small></span>${withDel ? `<button class="del" data-act="remDel" data-id="${r.id}" aria-label="Удалить">🗑️</button>` : ""}</div>`;
+}
+S.remind = () => {
+  const today = todayList();
+  const all = D.reminders.filter(r => r.kind !== "alarm").sort((a, b) => a.time.localeCompare(b.time));
+  const html = `<h2>Сегодня</h2>` + (today.length ? today.map(r => remCard(r, false)).join("") : "<p class='muted'>На сегодня ничего нет.</p>") +
+    `<button class="btn" data-act="go" data-to="remAdd">➕ Добавить напоминание</button>` +
+    (all.length ? `<h2>Все напоминания</h2>` + all.map(r => remCard(r, true)).join("") : "");
+  return { title: "Напоминания", html, speak: () => today.length ? "Сегодня: " + today.map(r => r.time + ", " + remTitle(r).replace(/^\S+\s/, "")).join("; ") : "На сегодня ничего нет." };
+};
+S.remAdd = () => {
+  const html = `
+    <label class="f">О чём напомнить?</label>
+    <div class="chips" id="kindChips">
+      ${["med", "doctor", "bill", "bday", "other"].map((k, i) => `<button class="chip${i === 0 ? " on" : ""}" data-act="kind" data-k="${k}">${KINDS[k][0]} ${KINDS[k][1]}</button>`).join("")}
+    </div>
+    <label class="f" for="rTitle">Подробнее (можно не писать)</label>
+    <input type="text" id="rTitle" placeholder="Например: таблетка от давления">
+    <label class="f" for="rRep">Как часто?</label>
+    <select id="rRep"><option value="daily">Каждый день</option><option value="once">Один раз</option><option value="yearly">Каждый год (день рождения)</option></select>
+    <div id="dateBox" hidden><label class="f" for="rDate">Дата</label><input type="date" id="rDate"></div>
+    <label class="f" for="rTime">Во сколько?</label>
+    <input type="time" id="rTime" value="09:00">
+    <div style="height:1rem"></div>
+    <button class="btn" data-act="remSave">Сохранить</button>
+    <button class="btn sec" data-act="back">Отмена</button>`;
+  return {
+    title: "Новое напоминание", html,
+    after(m) {
+      m.dataset.kind = "med";
+      const sel = $("#rRep"), box = $("#dateBox");
+      $("#rDate").value = ymd(new Date());
+      sel.onchange = () => { box.hidden = sel.value === "daily"; };
+    }
+  };
+};
+
+/* игры */
+S.games = () => ({
+  title: "Игры и память",
+  html: `<div class="grid">
+    <button class="tile" data-act="go" data-to="pairs"><span class="ic">🃏</span>Найди пару</button>
+    <button class="tile" data-act="go" data-to="words"><span class="ic">🔤</span>Составь слово</button>
+    <button class="tile" data-act="go" data-to="puzzle"><span class="ic">🧩</span>Пазл</button>
+    <button class="tile" data-act="go" data-to="remember"><span class="ic">🧠</span>Запомни картинки</button></div>
+    <p class="muted center" style="margin-top:1rem">Без спешки и без счёта времени. Играйте в своё удовольствие.</p>`,
+  speak: () => "Игры и память. Найди пару, составь слово, пазл, запомни картинки."
+});
+
+const EMOJI = ["🍎", "🍐", "🍒", "🍋", "🌻", "🌷", "🐱", "🐶", "🐦", "🐟", "🚗", "🏠", "⭐", "🍰", "🎈", "🔔", "🍄", "🐝", "🦋", "🍓"];
+
+S.pairs = () => ({
+  title: "Найди пару",
+  html: `<div class="info" id="pInfo"></div><div class="cards" id="cards"></div><div id="pWin"></div>`,
+  speak: () => "Открывайте по две карточки и ищите одинаковые картинки.",
+  after() {
+    const pool = shuffle(EMOJI.slice()).slice(0, 6);
+    const deck = shuffle([...pool, ...pool]);
+    const state = deck.map(() => "closed");
+    let first = null, lock = false, found = 0;
+    const cards = $("#cards"), info = $("#pInfo");
+    const draw = () => {
+      cards.innerHTML = deck.map((e, i) => `<button class="card ${state[i] === "open" ? "open" : state[i] === "done" ? "done" : ""}" data-i="${i}">${state[i] === "closed" ? "❔" : e}</button>`).join("");
+      info.textContent = "Найдено пар: " + found + " из 6";
+    };
+    draw();
+    cards.onclick = async e => {
+      const b = e.target.closest(".card"); if (!b || lock) return;
+      const i = +b.dataset.i; if (state[i] !== "closed") return;
+      state[i] = "open"; draw();
+      if (first === null) { first = i; return; }
+      const j = first; first = null;
+      if (deck[i] === deck[j]) {
+        state[i] = state[j] = "done"; found++; draw();
+        if (found === 6) $("#pWin").innerHTML = `<div class="win">🎉 Молодец! Все пары найдены!</div><button class="btn" data-act="redo">Сыграть ещё раз</button>`;
+      } else {
+        lock = true; await sleep(1100); state[i] = state[j] = "closed"; lock = false; draw();
+      }
+    };
+  }
+});
+
+const WORDS = [["🍎", "ЯБЛОКО"], ["🐱", "КОШКА"], ["🐶", "СОБАКА"], ["🌻", "ЦВЕТОК"], ["🚗", "МАШИНА"], ["☀️", "СОЛНЦЕ"], ["🌙", "ЛУНА"], ["🏠", "ДОМ"],
+  ["🍐", "ГРУША"], ["🍒", "ВИШНЯ"], ["🐟", "РЫБА"], ["🐦", "ПТИЦА"], ["🍰", "ТОРТ"], ["⭐", "ЗВЕЗДА"], ["🔔", "КОЛОКОЛ"], ["🍄", "ГРИБ"], ["🐝", "ПЧЕЛА"],
+  ["🦋", "БАБОЧКА"], ["🍓", "КЛУБНИКА"], ["🎈", "ШАР"], ["🍋", "ЛИМОН"], ["⏰", "ЧАСЫ"], ["📖", "КНИГА"], ["📞", "ТЕЛЕФОН"], ["☂️", "ЗОНТ"], ["🐴", "ЛОШАДЬ"],
+  ["🌳", "ДЕРЕВО"], ["🥛", "МОЛОКО"], ["🍞", "ХЛЕБ"], ["🥕", "МОРКОВЬ"]];
+S.words = () => ({
+  title: "Составь слово",
+  html: `<div class="emo" id="wEmo"></div><div class="info">Нажимайте на буквы по порядку.</div>
+    <div class="slots" id="slots"></div><div class="tiles" id="tiles"></div><div id="wMsg"></div>
+    <button class="btn sec" data-act="wHint">💡 Подсказка</button>`,
+  speak: () => "Составьте слово по картинке. Нажимайте на буквы по порядку.",
+  after() {
+    let queue = shuffle(WORDS.slice());
+    let word, letters, placed, order, hints;
+    const next = () => {
+      if (!queue.length) queue = shuffle(WORDS.slice());
+      const [emo, w] = queue.pop(); word = w; $("#wEmo").textContent = emo;
+      letters = shuffle(word.split("")); if (letters.join("") === word && word.length > 1) letters.reverse();
+      placed = []; order = []; hints = 0; $("#wMsg").innerHTML = ""; draw();
+    };
+    const draw = () => {
+      $("#slots").innerHTML = word.split("").map((ch, i) => `<button class="slot${placed[i] ? " ok" : ""}" data-s="${i}">${placed[i] ? esc(placed[i]) : ""}</button>`).join("");
+      $("#tiles").innerHTML = letters.map((ch, i) => `<button class="ltr${order.includes(i) ? " used" : ""}" data-l="${i}">${esc(ch)}</button>`).join("");
+    };
+    window.__wordsHint = () => {
+      const i = placed.length; if (i >= word.length) return;
+      // убрать неверное, если есть, и подставить правильную букву
+      placed = word.split("").slice(0, i + 1); order = [];
+      const used = new Set();
+      placed.forEach(ch => { const k = letters.findIndex((l, idx) => l === ch && !used.has(idx)); if (k >= 0) { used.add(k); order.push(k); } });
+      hints++; draw(); check();
+    };
+    const check = () => {
+      if (placed.length === word.length) {
+        if (placed.join("") === word) {
+          $("#wMsg").innerHTML = `<div class="win">✅ Верно! Это «${esc(word.toLowerCase())}»</div><button class="btn" data-act="wNext">Следующее слово</button>`;
+        } else {
+          $("#slots").classList.add("shake"); $("#wMsg").innerHTML = `<p class="center big">Почти! Попробуйте ещё раз.</p>`;
+          setTimeout(() => { placed = []; order = []; $("#slots").classList.remove("shake"); $("#wMsg").innerHTML = ""; draw(); }, 1100);
+        }
+      }
+    };
+    $("#tiles").onclick = e => {
+      const b = e.target.closest(".ltr"); if (!b) return;
+      const i = +b.dataset.l; if (order.includes(i) || placed.length >= word.length) return;
+      placed.push(letters[i]); order.push(i); draw(); check();
+    };
+    $("#slots").onclick = e => {
+      const b = e.target.closest(".slot"); if (!b) return;
+      if (placed.length === word.length && placed.join("") === word) return;
+      if (placed.length) { placed.pop(); order.pop(); draw(); }
+    };
+    window.__wordsNext = next;
+    next();
+  },
+  leave() { delete window.__wordsHint; delete window.__wordsNext; }
+});
+
+function sceneURL() {
+  const c = document.createElement("canvas"); c.width = c.height = 600; const g = c.getContext("2d");
+  const sky = g.createLinearGradient(0, 0, 0, 600); sky.addColorStop(0, "#bfe3f5"); sky.addColorStop(1, "#eaf6e4");
+  g.fillStyle = sky; g.fillRect(0, 0, 600, 600);
+  g.fillStyle = "#ffd54a"; g.beginPath(); g.arc(480, 110, 60, 0, 7); g.fill();
+  g.fillStyle = "#fff"; [[110, 100, 40], [150, 90, 50], [195, 105, 38]].forEach(([x, y, r]) => { g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); });
+  g.fillStyle = "#8bc27a"; g.beginPath(); g.ellipse(150, 520, 330, 170, 0, 0, 7); g.fill();
+  g.fillStyle = "#6fae65"; g.beginPath(); g.ellipse(470, 570, 320, 150, 0, 0, 7); g.fill();
+  g.fillStyle = "#f2d9b1"; g.fillRect(190, 300, 180, 130);
+  g.fillStyle = "#b5503c"; g.beginPath(); g.moveTo(170, 305); g.lineTo(280, 215); g.lineTo(390, 305); g.closePath(); g.fill();
+  g.fillStyle = "#7a4b2a"; g.fillRect(262, 360, 40, 70);
+  g.fillStyle = "#bfe3f5"; g.fillRect(205, 330, 38, 38); g.fillRect(317, 330, 38, 38);
+  const cols = ["#e8567a", "#f2a33c", "#9a6bd1", "#ffffff"];
+  for (let i = 0; i < 18; i++) {
+    const x = 30 + (i * 83) % 560, y = 470 + ((i * 47) % 110);
+    g.fillStyle = "#3f8a4a"; g.fillRect(x - 1.5, y, 3, 28);
+    g.fillStyle = cols[i % 4]; for (let k = 0; k < 5; k++) { g.beginPath(); g.arc(x + 9 * Math.cos(k * 1.256), y + 9 * Math.sin(k * 1.256), 7, 0, 7); g.fill(); }
+    g.fillStyle = "#ffd54a"; g.beginPath(); g.arc(x, y, 5, 0, 7); g.fill();
+  }
+  return c.toDataURL("image/jpeg", 0.9);
+}
+async function squareURL(blob) {
+  const url = URL.createObjectURL(blob);
+  const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+  const s = Math.min(img.width, img.height), c = document.createElement("canvas"); c.width = c.height = 600;
+  c.getContext("2d").drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, 600, 600);
+  URL.revokeObjectURL(url);
+  return c.toDataURL("image/jpeg", 0.88);
+}
+S.puzzle = () => ({
+  title: "Пазл",
+  html: `<div class="info">Нажмите на кусочек, потом на другой, чтобы поменять их местами.</div><div class="pz" id="pz"></div><div id="zMsg"></div>
+    <div class="row"><button class="btn sec" data-act="zPeek">👁️ Показать картинку</button><button class="btn sec" data-act="zNew">🔄 Другая</button></div>`,
+  speak: () => "Соберите картинку. Нажмите на кусочек, потом на другой, чтобы поменять их местами.",
+  async after() {
+    let url, order, sel = null, peek = false, solved = false;
+    const draw = () => {
+      $("#pz").innerHTML = order.map((p, pos) => {
+        const r = Math.floor(p / 3), c = p % 3;
+        return `<div class="pc${sel === pos ? " sel" : ""}" data-p="${pos}" style="background-image:url('${url}');background-size:300% 300%;background-position:${c * 50}% ${r * 50}%"></div>`;
+      }).join("");
+    };
+    const isSolved = () => order.every((p, i) => p === i);
+    const start = async () => {
+      let photos = []; try { photos = await idb.all("photos"); } catch (e) {}
+      url = photos.length && Math.random() < 0.7 ? await squareURL(photos[Math.floor(Math.random() * photos.length)].blob).catch(sceneURL) : sceneURL();
+      do { order = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]); } while (isSolved());
+      sel = null; solved = false; peek = false; $("#zMsg").innerHTML = ""; draw();
+    };
+    $("#pz").onclick = e => {
+      if (solved || peek) return;
+      const b = e.target.closest(".pc"); if (!b) return; const pos = +b.dataset.p;
+      if (sel === null) sel = pos;
+      else if (sel === pos) sel = null;
+      else { [order[sel], order[pos]] = [order[pos], order[sel]]; sel = null; }
+      draw();
+      if (isSolved()) { solved = true; $("#zMsg").innerHTML = `<div class="win">🎉 Картинка собрана! Молодец!</div>`; }
+    };
+    window.__zPeek = () => {
+      peek = !peek;
+      if (peek) $("#pz").innerHTML = Array(9).fill(0).map((_, i) => `<div class="pc" style="background-image:url('${url}');background-size:300% 300%;background-position:${(i % 3) * 50}% ${Math.floor(i / 3) * 50}%"></div>`).join("");
+      else draw();
+    };
+    window.__zNew = start;
+    await start();
+  },
+  leave() { delete window.__zPeek; delete window.__zNew; }
+});
+
+S.remember = () => ({
+  title: "Запомни картинки",
+  html: `<div id="rBox"></div>`,
+  speak: () => "Посмотрите на картинки и запомните их. Потом выберите те, что были на экране.",
+  after() {
+    let n = 3; const box = $("#rBox");
+    let shown, selected;
+    const intro = () => {
+      shown = shuffle(EMOJI.slice()).slice(0, n); selected = new Set();
+      box.innerHTML = `<p class="center big">Запомните ${n} ${n < 5 ? "картинки" : "картинок"}</p><div class="show">${shown.map(e => `<span>${e}</span>`).join("")}</div>
+        <button class="btn" data-act="rReady">Запомнила, дальше</button>`;
+    };
+    const quiz = () => {
+      const others = shuffle(EMOJI.filter(e => !shown.includes(e))).slice(0, 9 - n);
+      const opts = shuffle([...shown, ...others]);
+      box.innerHTML = `<p class="center big">Что было на экране?</p><p class="center muted">Выберите ${n} ${n < 5 ? "картинки" : "картинок"}</p>
+        <div class="pick" id="pick">${opts.map(e => `<button class="card" data-e="${e}">${e}</button>`).join("")}</div><div id="rMsg"></div>`;
+      $("#pick").onclick = ev => {
+        const b = ev.target.closest(".card"); if (!b || selected.size >= n && !selected.has(b.dataset.e)) return;
+        const e = b.dataset.e; if (selected.has(e)) { selected.delete(e); b.classList.remove("sel"); } else { selected.add(e); b.classList.add("sel"); }
+        if (selected.size === n) {
+          const right = [...selected].filter(x => shown.includes(x)).length;
+          if (right === n) { n = Math.min(n + 1, 6); $("#rMsg").innerHTML = `<div class="win">🎉 Отлично! Всё верно!</div><button class="btn" data-act="rNext">Дальше</button>`; }
+          else { $("#rMsg").innerHTML = `<div class="win" style="background:var(--warm)">Угадано: ${right} из ${n}. Были такие:<div class="show" style="margin:.4rem 0 0">${shown.map(x => `<span>${x}</span>`).join("")}</div></div><button class="btn" data-act="rNext">Ещё раз</button>`; }
+        }
+      };
+    };
+    window.__rReady = quiz; window.__rNext = intro;
+    intro();
+  },
+  leave() { delete window.__rReady; delete window.__rNext; }
+});
+
+/* фото */
+let photoURLs = [];
+S.photos = () => ({
+  title: "Фото семьи",
+  html: `<div id="phBox"><p class="muted">Загружаю…</p></div>
+    <input type="file" id="phFile" accept="image/*" multiple hidden>
+    <button class="btn" data-act="phAdd">➕ Добавить фото</button>`,
+  speak: () => "Фото семьи. Нажмите на фото, чтобы посмотреть.",
+  async after() {
+    photoURLs.forEach(u => URL.revokeObjectURL(u)); photoURLs = [];
+    let list = []; try { list = await idb.all("photos"); } catch (e) {}
+    const box = $("#phBox"); if (!box) return;
+    if (!list.length) { box.innerHTML = `<p>Здесь пока нет фотографий. Нажмите «Добавить фото» и выберите снимки из телефона.</p>`; }
+    else {
+      photoURLs = list.map(p => URL.createObjectURL(p.blob));
+      box.innerHTML = `<button class="btn sec" data-act="slideshow">▶ Показать все по очереди</button><div class="photos">${list.map((p, i) => `<button data-act="photoOpen" data-i="${i}"><img src="${photoURLs[i]}" alt=""></button>`).join("")}</div><div style="height:.8rem"></div>`;
+    }
+    $("#phFile").onchange = async e => {
+      const files = [...e.target.files]; if (!files.length) return;
+      toast("Добавляю фото…");
+      for (const f of files) { try { await idb.add("photos", { blob: await resizeImage(f, 1400, 0.82), ts: Date.now() }); } catch (er) { console.error(er); } }
+      render();
+    };
+  },
+  leave() { photoURLs.forEach(u => URL.revokeObjectURL(u)); photoURLs = []; }
+});
+async function resizeImage(file, max, q) {
+  const url = URL.createObjectURL(file);
+  const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+  const k = Math.min(1, max / Math.max(img.width, img.height));
+  const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+  c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+  return new Promise(r => c.toBlob(r, "image/jpeg", q));
+}
+async function fileToSmallDataURL(file, max) {
+  const b = await resizeImage(file, max, 0.8);
+  return new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b); });
+}
+S.photoView = ({ i, auto }) => ({
+  title: "Фото", noSos: false,
+  html: `<div class="viewer"><img id="bigPh" alt=""></div>
+    <div class="row"><button class="btn sec" data-act="phPrev">◀</button><button class="btn sec" data-act="phNext">▶</button></div>
+    ${auto ? `<button class="btn sec" data-act="back">Закончить показ</button>` : `<button class="btn sec" data-act="phDel">🗑️ Убрать это фото</button>`}`,
+  speak: () => "Фото семьи",
+  async after() {
+    let iv = null, urls = [];
+    leave = () => { if (iv) clearInterval(iv); urls.forEach(u => URL.revokeObjectURL(u)); delete window.__ph; };
+    let list = []; try { list = await idb.all("photos"); } catch (e) {}
+    let idx = Math.min(i, list.length - 1); if (idx < 0) return back();
+    urls = list.map(p => URL.createObjectURL(p.blob));
+    const show = () => { $("#bigPh").src = urls[idx]; };
+    show();
+    window.__ph = { prev: () => { idx = (idx - 1 + urls.length) % urls.length; show(); }, next: () => { idx = (idx + 1) % urls.length; show(); },
+      del: async () => { if (await ask("Убрать это фото из альбома?", "Да, убрать", "Нет")) { await idb.del("photos", list[idx].id); back(); } } };
+    if (auto) iv = setInterval(() => window.__ph && window.__ph.next(), 6000);
+  }
+});
+
+/* слушать */
+let player = null;
+S.listen = ({ tab }) => {
+  tab = tab || "book";
+  return {
+    title: "Слушать",
+    html: `<div class="tabs"><button class="chip${tab === "book" ? " on" : ""}" data-act="tab" data-t="book">📚 Аудиокниги</button><button class="chip${tab === "prayer" ? " on" : ""}" data-act="tab" data-t="prayer">🙏 Молитвы</button></div>
+      <div id="nowBox"></div><div id="lsBox"><p class="muted">Загружаю…</p></div>
+      <input type="file" id="auFile" accept="audio/*" multiple hidden>
+      <button class="btn sec" data-act="auAdd">➕ Добавить запись</button>`,
+    speak: () => "Здесь можно слушать аудиокниги и молитвы. Нажмите на название, чтобы включить.",
+    async after() {
+      let list = []; try { list = (await idb.all("audio")).filter(a => a.cat === tab); } catch (e) {}
+      const box = $("#lsBox"); if (!box) return;
+      box.innerHTML = list.length ? list.map(a => `<div class="item"><button class="item" style="border:none;padding:0;margin:0" data-act="auPlay" data-id="${a.id}"><span class="ic">▶️</span><span class="tx"><span class="big">${esc(a.name)}</span></span></button><button class="del" data-act="auDel" data-id="${a.id}" aria-label="Убрать">🗑️</button></div>`).join("")
+        : `<p>Здесь пока пусто. Попросите родных добавить записи, или нажмите «Добавить запись» и выберите файл на телефоне.</p>`;
+      $("#auFile").onchange = async e => {
+        const files = [...e.target.files]; if (!files.length) return; toast("Добавляю…");
+        for (const f of files) { try { await idb.add("audio", { name: f.name.replace(/\.[^.]+$/, ""), cat: tab, blob: f }); } catch (er) { toast("Файл слишком большой для сохранения"); } }
+        render();
+      };
+      window.__au = {
+        list,
+        play: id => {
+          const a = list.find(x => x.id == id); if (!a) return;
+          stopPlayer(); player = new Audio(URL.createObjectURL(a.blob)); player.play().catch(() => toast("Не получилось включить"));
+          $("#nowBox").innerHTML = `<div class="now"><div class="nm">${esc(a.name)}</div><div class="row"><button class="btn small sec" data-act="au15" data-d="-15">⏪ 15 сек</button><button class="btn small" data-act="auToggle">⏯ Пауза / Играть</button><button class="btn small sec" data-act="au15" data-d="15">15 сек ⏩</button></div></div>`;
+        }
+      };
+    },
+    leave() { stopPlayer(); delete window.__au; }
+  };
+};
+function stopPlayer() { if (player) { try { player.pause(); URL.revokeObjectURL(player.src); } catch (e) {} player = null; } }
+
+/* полезное */
+S.tools = () => ({
+  title: "Полезное",
+  html: `<div class="grid">
+    <button class="tile" data-act="go" data-to="calc"><span class="ic">🧮</span>Калькулятор</button>
+    <button class="tile" data-act="go" data-to="alarm"><span class="ic">⏰</span>Будильник</button>
+    <button class="tile" data-act="go" data-to="torch"><span class="ic">🔦</span>Фонарик</button></div>`,
+  speak: () => "Полезное. Калькулятор, будильник и фонарик."
+});
+S.calc = () => ({
+  title: "Калькулятор",
+  html: `<div class="disp" id="disp">0</div><div class="keys" id="keys">
+    ${[["C", "cl"], ["⌫", "cl"], ["÷", "op"], ["×", "op"], ["7"], ["8"], ["9"], ["−", "op"], ["4"], ["5"], ["6"], ["+", "op"], ["1"], ["2"], ["3"], ["=", "eq"], ["0"], [","]].map(([k, c]) => `<button class="key ${c || ""}" data-k="${k}" ${k === "0" ? 'style="grid-column:span 2"' : ""}>${k}</button>`).join("")}
+    </div>`.replace('data-k="="', 'data-k="=" style="grid-row:span 2;grid-column:4"'),
+  speak: () => "Калькулятор",
+  after() {
+    let curS = "0", prev = null, op = null, fresh = false;
+    const disp = $("#disp");
+    const fmt = v => { if (!isFinite(v)) return "Ошибка"; let s = String(Math.round(v * 1e9) / 1e9); return s.replace(".", ","); };
+    const show = () => { disp.textContent = curS.replace(".", ",") + (op && fresh ? " " + op : ""); };
+    const calc = () => { const a = prev, b = parseFloat(curS); let r; if (op === "+") r = a + b; else if (op === "−") r = a - b; else if (op === "×") r = a * b; else r = b === 0 ? NaN : a / b; return r; };
+    $("#keys").onclick = e => {
+      const b = e.target.closest(".key"); if (!b) return; const k = b.dataset.k;
+      if (/\d/.test(k)) { if (fresh || curS === "0" || curS === "Ошибка") { curS = k; fresh = false; } else if (curS.length < 12) curS += k; }
+      else if (k === ",") { if (fresh || curS === "Ошибка") { curS = "0"; fresh = false; } if (!curS.includes(".")) curS += "."; }
+      else if (k === "C") { curS = "0"; prev = null; op = null; fresh = false; }
+      else if (k === "⌫") { if (!fresh) curS = curS.length > 1 && curS !== "Ошибка" ? curS.slice(0, -1) : "0"; }
+      else if (k === "=") { if (op && prev !== null) { curS = fmt(calc()).replace(",", "."); if (curS === "Ошибка") curS = "Ошибка"; prev = null; op = null; fresh = true; } }
+      else { if (op && prev !== null && !fresh) { curS = fmt(calc()).replace(",", "."); } prev = parseFloat(curS); if (isNaN(prev)) { prev = null; curS = "0"; } op = k; fresh = true; }
+      show();
+    };
+  }
+});
+S.alarm = () => {
+  const al = D.reminders.filter(r => r.kind === "alarm").sort((a, b) => a.time.localeCompare(b.time));
+  return {
+    title: "Будильник",
+    html: `<label class="f" for="aTime">Во сколько разбудить?</label><input type="time" id="aTime" value="07:30">
+      <label class="f" for="aRep">Как часто?</label><select id="aRep"><option value="daily">Каждый день</option><option value="once">Один раз</option></select>
+      <div style="height:1rem"></div><button class="btn" data-act="alarmSave">⏰ Поставить будильник</button>
+      ${al.length ? "<h2>Мои будильники</h2>" + al.map(r => `<div class="item"><span class="tx"><span class="big">⏰ ${esc(r.time)}</span><small>${r.repeat === "daily" ? "каждый день" : "один раз"}</small></span><button class="del" data-act="remDel" data-id="${r.id}" data-back="1" aria-label="Удалить">🗑️</button></div>`).join("") : ""}`,
+    speak: () => al.length ? "Будильники: " + al.map(r => r.time).join(", ") : "Будильников пока нет."
+  };
+};
+S.torch = () => ({
+  title: "Фонарик",
+  html: `<p class="center muted" id="tMsg"></p><button class="btn" id="tBtn" style="min-height:9rem;font-size:2rem" data-act="torch">🔦 Включить</button>`,
+  speak: () => "Фонарик. Нажмите на большую кнопку, чтобы включить или выключить.",
+  async after() {
+    const T = plug("Torch");
+    if (!T) { $("#tMsg").textContent = "Фонарик работает только в установленном приложении на телефоне."; return; }
+    try { const e = await T.isEnabled(); $("#tBtn").textContent = e.enabled ? "🔦 Выключить" : "🔦 Включить"; } catch (e) {}
+  }
+});
+
+/* для семьи */
+S.family = () => ({
+  title: "Для семьи", noSos: true,
+  html: `<p class="muted">Этот раздел для родных, которые помогают настроить приложение.</p>
+    <h2>Кому можно звонить</h2>
+    ${D.contacts.length ? D.contacts.map(x => `<div class="item">${x.photo ? `<img class="av" src="${x.photo}" alt="">` : `<span class="av ph">👤</span>`}
+      <span class="tx"><b>${esc(x.name)}</b><small>${esc(x.phone)}</small></span>
+      <button class="del" data-act="go" data-to="contactEdit" data-id="${x.id}" aria-label="Изменить">✏️</button>
+      <button class="del" data-act="cDel" data-id="${x.id}" aria-label="Удалить">🗑️</button></div>`).join("") : "<p class='muted'>Пока никого нет.</p>"}
+    <button class="btn sec" data-act="go" data-to="contactEdit">➕ Добавить человека</button>
+    <h2>Кому звонить при вызове помощи (SOS)</h2>
+    <select id="sosSel">${D.contacts.length ? D.contacts.map(x => `<option value="${x.id}" ${x.id == D.sos ? "selected" : ""}>${esc(x.name)}</option>`).join("") : "<option>Сначала добавьте человека</option>"}</select>
+    <h2>Размер текста</h2>
+    <div class="row"><button class="btn sec" data-act="scale" data-v="1">Обычный</button><button class="btn sec" data-act="scale" data-v="1.2">Крупный</button><button class="btn sec" data-act="scale" data-v="1.4">Очень крупный</button></div>
+    <h2>Тишина</h2>
+    <p class="muted">Приложение не показывает рекламу и не присылает сообщений. Звуковые сигналы приходят только от напоминаний и будильников, которые вы настроили.</p>`,
+  after() { const s = $("#sosSel"); if (s) s.onchange = () => { D.sos = +s.value; save(); toast("Сохранено"); }; if (s && D.contacts.length && !D.sos) { D.sos = D.contacts[0].id; save(); } }
+});
+S.contactEdit = ({ id }) => {
+  const x = id ? D.contacts.find(c => c.id == id) : null;
+  return {
+    title: x ? "Изменить" : "Новый человек", noSos: true,
+    html: `<label class="f" for="cName">Имя (как бабушка его называет)</label><input type="text" id="cName" value="${esc(x ? x.name : "")}" placeholder="Например: Лена">
+      <label class="f" for="cPhone">Номер телефона</label><input type="tel" id="cPhone" value="${esc(x ? x.phone : "")}" placeholder="+7 900 000-00-00">
+      <label class="f">Фото (по желанию)</label><input type="file" id="cPhoto" accept="image/*" hidden>
+      <div id="cPrev" class="center">${x && x.photo ? `<img class="bigav" src="${x.photo}" alt="">` : ""}</div>
+      <button class="btn sec" data-act="cPick">📷 Выбрать фото</button>
+      <button class="btn" data-act="cSave" data-id="${x ? x.id : ""}">Сохранить</button>
+      <button class="btn sec" data-act="back">Отмена</button>`,
+    after() {
+      window.__cPhoto = x && x.photo ? x.photo : null;
+      $("#cPhoto").onchange = async e => { const f = e.target.files[0]; if (!f) return; window.__cPhoto = await fileToSmallDataURL(f, 240); $("#cPrev").innerHTML = `<img class="bigav" src="${window.__cPhoto}" alt="">`; };
+    }
+  };
+};
+
+/* ---------- действия ---------- */
+const ACT = {
+  go: d => go(d.to, d.id ? { id: d.id } : {}),
+  back: () => back(),
+  speak: () => speak(speakText()),
+  sos: () => go("sos"),
+  callAsk: d => go("callConfirm", { id: d.id }),
+  doCall: d => callPhone(d.phone),
+  doSms: d => openUrl("sms:" + cleanNum(d.phone) + "?body=" + encodeURIComponent("Мне нужна помощь. Пожалуйста, позвони мне.")),
+  redo: () => render(),
+  wHint: () => window.__wordsHint && window.__wordsHint(),
+  wNext: () => window.__wordsNext && window.__wordsNext(),
+  zPeek: () => window.__zPeek && window.__zPeek(),
+  zNew: () => window.__zNew && window.__zNew(),
+  rReady: () => window.__rReady && window.__rReady(),
+  rNext: () => window.__rNext && window.__rNext(),
+  phAdd: () => $("#phFile").click(),
+  photoOpen: d => go("photoView", { i: +d.i }),
+  slideshow: () => go("photoView", { i: 0, auto: true }),
+  phPrev: () => window.__ph && window.__ph.prev(),
+  phNext: () => window.__ph && window.__ph.next(),
+  phDel: () => window.__ph && window.__ph.del(),
+  tab: d => { stack[stack.length - 1].params = { tab: d.t }; render(); },
+  auAdd: () => $("#auFile").click(),
+  auPlay: d => window.__au && window.__au.play(d.id),
+  auToggle: () => { if (player) { player.paused ? player.play() : player.pause(); } },
+  au15: d => { if (player) player.currentTime = Math.max(0, player.currentTime + (+d.d)); },
+  auDel: async d => { if (await ask("Убрать эту запись?", "Да, убрать", "Нет")) { await idb.del("audio", +d.id); render(); } },
+  kind: (d, el) => { document.querySelectorAll("#kindChips .chip").forEach(c => c.classList.remove("on")); el.classList.add("on"); $("#main").dataset.kind = d.k;
+    const sel = $("#rRep"); if (d.k === "bday") sel.value = "yearly"; else if (d.k === "med") sel.value = "daily"; else if (d.k === "doctor" || d.k === "bill") sel.value = "once"; sel.onchange(); },
+  remSave: async () => {
+    const kind = $("#main").dataset.kind || "med", repeat = $("#rRep").value, time = $("#rTime").value || "09:00", date = $("#rDate").value || ymd(new Date());
+    if (repeat !== "daily" && !$("#rDate").value) return toast("Выберите дату");
+    await addReminder({ kind, title: $("#rTitle").value.trim(), repeat, time, date: repeat === "daily" ? null : date });
+    toast("Напоминание сохранено"); back();
+  },
+  remDel: async (d) => { if (await ask("Удалить это напоминание?", "Да, удалить", "Нет")) { await removeReminder(+d.id); render(); } },
+  alarmSave: async () => {
+    const time = $("#aTime").value; if (!time) return toast("Выберите время");
+    const repeat = $("#aRep").value; const now = new Date(); const t = new Date(ymd(now) + "T" + time);
+    const day = t <= now ? new Date(now.getTime() + 864e5) : now;
+    await addReminder({ kind: "alarm", title: "Будильник", repeat, time, date: repeat === "daily" ? null : ymd(day) });
+    toast("Будильник поставлен"); render();
+  },
+  torch: async () => {
+    const T = plug("Torch"); if (!T) return toast("Фонарик работает только в приложении на телефоне");
+    try { await T.toggle(); const e = await T.isEnabled(); $("#tBtn").textContent = e.enabled ? "🔦 Выключить" : "🔦 Включить"; } catch (e) { toast("Не получилось включить фонарик"); }
+  },
+  cPick: () => $("#cPhoto").click(),
+  cSave: d => {
+    const name = $("#cName").value.trim(), phone = $("#cPhone").value.trim();
+    if (!name || cleanNum(phone).length < 3) return toast("Впишите имя и номер");
+    if (d.id) { const x = D.contacts.find(c => c.id == d.id); x.name = name; x.phone = phone; x.photo = window.__cPhoto; }
+    else { const x = { id: D.seq++, name, phone, photo: window.__cPhoto || null }; D.contacts.push(x); if (!D.sos) D.sos = x.id; }
+    save(); toast("Сохранено"); back();
+  },
+  cDel: async d => { if (await ask("Убрать этого человека из списка?", "Да, убрать", "Нет")) { D.contacts = D.contacts.filter(c => c.id != d.id); if (D.sos == d.id) D.sos = D.contacts[0] ? D.contacts[0].id : null; save(); render(); } },
+  scale: d => { D.scale = +d.v; save(); applyScale(); toast("Готово"); }
+};
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-act]"); if (!a) return;
+  const f = ACT[a.dataset.act]; if (f) f(a.dataset, a);
+});
+
+/* ---------- запуск ---------- */
+applyScale();
+render();
+(function nativeInit() {
+  const A = plug("App");
+  if (A) A.addListener("backButton", () => { if (!$("#modal").hidden) { $("#modal").hidden = true; return; } if (!back()) A.exitApp(); });
+})();
+</script>
+</body>
+</html>
