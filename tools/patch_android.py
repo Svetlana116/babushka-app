@@ -1,0 +1,19 @@
+"""Добавляет разрешения и значок уведомлений в созданный Capacitor проект Android."""
+p = "android/app/src/main/AndroidManifest.xml"
+s = open(p, encoding="utf-8").read()
+marker = '<uses-permission android:name="android.permission.INTERNET" />'
+assert marker in s, "не нашёл строку с INTERNET в AndroidManifest.xml"
+if "USE_EXACT_ALARM" not in s:
+    s = s.replace(marker, marker + '''
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- точные напоминания и будильники -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />''')
+    open(p, "w", encoding="utf-8").write(s)
+open("android/app/src/main/res/drawable/ic_stat_bell.xml", "w", encoding="utf-8").write('''<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M12,22c1.1,0 2,-0.9 2,-2h-4c0,1.1 0.9,2 2,2zM18,16v-5c0,-3.07 -1.63,-5.64 -4.5,-6.32V4c0,-0.83 -0.67,-1.5 -1.5,-1.5s-1.5,0.67 -1.5,1.5v0.68C7.64,5.36 6,7.92 6,11v5l-2,2v1h16v-1l-2,-2z"/>
+</vector>
+''')
+print("Android-проект подготовлен")

@@ -1,0 +1,9 @@
+{
+  "appId": "ru.family.babushka",
+  "appName": "Мой помощник",
+  "webDir": "www",
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "LocalNotifications": { "smallIcon": "ic_stat_bell", "iconColor": "#2f6f5e" }
+  }
+}
